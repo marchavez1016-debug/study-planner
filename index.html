@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Study Planner</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">SP</div>
+          <div>
+            <h1>Study Planner</h1>
+            <p>Canvas-aware study planning</p>
+          </div>
+          <button class="icon-action sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse sidebar">‹</button>
+        </div>
+
+        <nav class="nav-list" aria-label="Study planner sections">
+          <a href="#canvas">Calendar</a>
+          <a href="#subjects">Classes</a>
+        </nav>
+
+        <section class="sidebar-panel">
+          <h2>Today</h2>
+          <p id="todayFocus">Add assignments and class materials to build your first plan.</p>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h2>Study dashboard</h2>
+            <p class="helper-text">Plan around your classes, deadlines, materials, and review topics.</p>
+          </div>
+          <button class="primary-action" id="generatePlanBtn" type="button">Generate plan</button>
+        </header>
+
+        <section class="panel subjects-panel" id="subjects">
+          <div class="panel-heading">
+            <div>
+              <h3>Classes</h3>
+              <p class="helper-text">Open a class to manage its materials, study plan, and videos.</p>
+            </div>
+          </div>
+          <div class="subject-grid" id="subjectOverview"></div>
+        </section>
+
+        <section class="class-page is-hidden" id="classPage" aria-live="polite">
+          <div class="class-page-header panel">
+            <button class="secondary-action" id="returnHomeBtn" type="button">Return home</button>
+            <div>
+              <h2 id="classTitle">Class</h2>
+              <p class="helper-text" id="classSummary">Class assignments and study tools.</p>
+            </div>
+          </div>
+
+          <article class="panel" id="classAssignmentsPanel">
+            <div class="panel-heading">
+              <div>
+                <h3>Class assignments</h3>
+              </div>
+            </div>
+            <div class="list" id="classAssignmentList"></div>
+          </article>
+
+          <article class="panel" id="materials">
+            <div class="panel-heading">
+              <div>
+                <h3>Slides and PDFs</h3>
+                <p class="helper-text">Add materials for this class.</p>
+              </div>
+              <span class="status-pill" id="topicCount">0 topics</span>
+            </div>
+
+            <label class="upload-box" for="materialFiles">
+              <input id="materialFiles" type="file" multiple accept=".txt,.md,.csv,.ics,.pdf,.ppt,.pptx" />
+              <strong>Upload class materials</strong>
+              <span>Text files work now. PDF and slide extraction are marked for the next backend step.</span>
+            </label>
+
+            <label class="field-label" for="notesInput">Or paste lecture text / slide notes</label>
+            <textarea id="notesInput" rows="8" placeholder="Paste notes from slides, readings, or study guides here."></textarea>
+
+            <div class="button-row">
+              <button class="secondary-action" id="extractTopicsBtn" type="button">Extract topics</button>
+              <button class="secondary-action" id="clearBtn" type="button">Clear</button>
+            </div>
+
+            <div class="topic-cloud" id="topicCloud" aria-live="polite"></div>
+          </article>
+
+          <section class="grid two-column">
+            <article class="panel tall" id="plan">
+              <div class="panel-heading">
+                <div>
+                  <h3>Study plan</h3>
+                </div>
+                <span class="status-pill">Adaptive draft</span>
+              </div>
+              <div class="plan-list" id="planList"></div>
+            </article>
+
+            <article class="panel tall" id="videos">
+              <div class="panel-heading">
+                <div>
+                  <h3>Credible videos</h3>
+                </div>
+                <span class="status-pill">Trusted sources</span>
+              </div>
+              <div class="filter-row" role="group" aria-label="Video length filter">
+                <button class="filter is-active" data-length="any" type="button">Any</button>
+                <button class="filter" data-length="short" type="button">Short</button>
+                <button class="filter" data-length="deep" type="button">Deep</button>
+              </div>
+              <div class="video-list" id="videoList"></div>
+            </article>
+          </section>
+        </section>
+      </section>
+
+      <aside class="right-rail" id="canvas" aria-label="Canvas calendar">
+        <section class="rail-panel assignment-sidebar" aria-label="Canvas assignments">
+          <div class="assignment-sidebar-heading">
+            <div class="assignment-title-row">
+              <div>
+                <h4>Assignments</h4>
+                <p class="helper-text" id="canvasHelper">Upload your Canvas calendar file.</p>
+              </div>
+              <span class="status-pill" id="assignmentCount">0 items</span>
+            </div>
+            <div class="filter-row compact" role="group" aria-label="Assignment date filter">
+              <button class="filter assignment-filter is-active" data-assignment-range="week" type="button">Week</button>
+              <button class="filter assignment-filter" data-assignment-range="month" type="button">Month</button>
+              <button class="filter assignment-filter" data-assignment-range="all" type="button">All</button>
+            </div>
+            <button class="secondary-action full-action" id="openCalendarModalBtn" type="button">Upload calendar</button>
+          </div>
+          <div class="list assignment-scroll" id="assignmentList" aria-live="polite"></div>
+        </section>
+      </aside>
+    </main>
+
+    <div class="modal-backdrop is-hidden" id="calendarModal" role="dialog" aria-modal="true" aria-labelledby="calendarModalTitle">
+      <section class="modal-panel">
+        <div class="panel-heading">
+          <div>
+            <h3 id="calendarModalTitle">Upload Canvas calendar</h3>
+            <p class="helper-text">Choose the downloaded .ics file from Canvas.</p>
+          </div>
+          <button class="icon-action" id="closeCalendarModalBtn" type="button" aria-label="Close upload dialog">×</button>
+        </div>
+
+        <label class="field-label" for="canvasFile">Calendar file</label>
+        <input class="file-input" id="canvasFile" type="file" accept=".ics,.txt" />
+      </section>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
